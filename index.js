@@ -1,10 +1,4 @@
 const axios = require('axios')
-const cheerio = require('cheerio')
-
-function isEmail(email) {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
 
 /**
  * Returns an html string of a page
@@ -19,16 +13,9 @@ async function fetchPage(url) {
 }
 
 function extractEmails(html) {
-    const emails = []
-    const $ = cheerio.load(html)
-    const anchorTags = $('a')
-    anchorTags.each((i, a) => {
-        const text = $(a).text()
-        if (isEmail(text)) {
-            emails.push(text)
-        }
-    })
-    return emails
+    const emails = html.match(/(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/g)
+    const uniqueEmails = [...new Set(emails)]
+    return uniqueEmails
 }
 
 const runProgram = async () => {
